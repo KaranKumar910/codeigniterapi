@@ -98,17 +98,43 @@ class Welcome extends CI_Controller {
 			// $post = $this->input->post();
 			$this->load->view('profile');
 		}
-		function editprofile($id){
-			$post=$this->input->post();
-			if($post){
-				$this->db->where('id',$id)->update('login',$post);
-				$this->load->view('welcome/profile');
-			}
-		$this->load->view('welcome/editprofile',['tid'=>$id]);
-	}
+		
+    public function EditProfile($id) {
+        $edit = $this->db->where('id', $id)->get('login');
+
+        if ($edit->num_rows() > 0) {
+            $data['key'] = $edit->row();
+            $this->load->view('EditProfile', $data);
+        } else {
+            echo "No data found";
+        }
+    }
+
+    public function updateProfile($id) {
+        $post = $this->input->post();
+
+        if ($post) {
+            $data = array(
+                'name' => $post['name'],
+                'email' => $post['email'],
+                'password' => $post['password'],
+                'image' => $post['image']
+            );
+
+            $this->db->where('id', $id)->update('login', $data);
+            redirect('welcome/profile'); // Redirect to profile page after successful update
+        }
+    }
+
 	function delete_profile($id = 0){
 		$this->db->where('id',$id)->delete('login');
 		redirect(site_url('welcome/index'));
+	}
+	function logout(){
+		$this->session->sess_destroy();
+
+        // Redirect to the login page or any other desired page
+        redirect('welcome/login');
 	}
 
 }
